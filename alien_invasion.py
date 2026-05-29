@@ -1,5 +1,7 @@
 import sys
 import pygame
+from settings import Settings
+from ship import Ship
 
 class AlienInvasion:
     """Class for managing resourses and working of the game"""
@@ -8,19 +10,42 @@ class AlienInvasion:
         """Initialisation of the game nad it's resources"""
         pygame.init()
         self.clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode((1200, 800))
+        self.settings = Settings()
+        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien invasion")
-        self.bg_color = (230, 230, 230)
+
+        self.ship = Ship(self)
 
     def run_game(self):
         """Starting the game loop"""
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-                self.screen.fill((self.bg_color))
-                pygame.display.flip()
-                self.clock.tick(60)
+            self._check_events()
+            self.ship.update()
+            self._update_screen()
+            self.clock.tick(60)  
+
+
+    def _check_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    self.ship.moving_right = True
+                if event.key == pygame.K_LEFT:
+                    self.ship.moving_left = True
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_RIGHT:
+                    self.ship.moving_right = False
+                if event.key == pygame.K_LEFT:
+                    self.ship.moving_left = False
+
+
+    def _update_screen(self):
+            self.screen.fill((self.settings.bg_color))
+            self.ship.blitme()
+
+            pygame.display.flip()
 
 
 if __name__ == '__main__':
