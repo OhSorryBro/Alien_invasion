@@ -33,18 +33,29 @@ class AlienInvasion:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
+            
 
     def _check_keydown_events(self, event):
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = True
         if event.key == pygame.K_LEFT:
             self.ship.moving_left = True
+        if event.key == pygame.K_UP:
+            self.ship.moving_up = True
+        if event.key == pygame.K_DOWN:
+            self.ship.moving_down = True
     
     def _check_keyup_events(self, event):
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = False
         if event.key == pygame.K_LEFT:
             self.ship.moving_left = False
+        if event.key == pygame.K_UP:
+            self.ship.moving_up = False
+        if event.key == pygame.K_DOWN:
+            self.ship.moving_down = False
+        if event.key == pygame.K_q:
+            sys.exit()
 
     def _update_screen(self):
             self.screen.fill((self.settings.bg_color))
