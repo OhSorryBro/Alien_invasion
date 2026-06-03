@@ -1,8 +1,11 @@
 import sys
 import pygame
+import random
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
+from star import Star
 
 class AlienInvasion:
     """Class for managing resourses and working of the game"""
@@ -17,6 +20,10 @@ class AlienInvasion:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+        self.stars = pygame.sprite.Group()
+        self._create_stars()
+        self._create_fleet()
 
     def run_game(self):
         """Starting the game loop"""
@@ -71,16 +78,56 @@ class AlienInvasion:
 
     def _update_bullets(self):
         self.bullets.update()
-
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+    def _create_fleet(self):
+        alien = Alien(self)
+        alien_width, alien_height = alien.rect.size
+
+        current_x, current_y = alien_width, alien_height
+        while current_y < (self.settings.screen_height - 3 * alien_height):
+            while current_x < (self.settings.screen_width -2 * alien_width):
+                self._create_alien(current_x, current_y)
+                current_x += 2* alien_width
+
+            current_x = alien_width
+            current_y += 2* alien_height
+
+    def _create_stars(self):
+        star = Star(self)
+        star_width, star_height = star.rect.size
+        
+        current_x, current_y = star_width, star_height
+        amount_of_stars = (self.settings.screen_width + self.settings.screen_height) / 150
+        for _ in range(int(amount_of_stars)):
+            current_x = random.randint(50, self.settings.screen_width - 50)
+            current_y = random.randint(50, self.settings.screen_height -50)
+            self._create_star(current_x, current_y)
+    
+    def _create_alien(self, x_position, y_position):        
+            new_alien = Alien(self)
+            new_alien.x = x_position
+            new_alien.rect.x = x_position
+            new_alien.rect.y = y_position
+            self.aliens.add(new_alien)
+
+    def _create_star(self, x_position, y_position):
+            new_star = Star(self)
+            new_star.x = x_position
+            new_star.rect.x = x_position
+            new_star.rect.y = y_position
+            self.stars.add(new_star)
+
+
     def _update_screen(self):
             self.screen.fill((self.settings.bg_color))
+            self.stars.draw(self.screen)
             for bullet in self.bullets.sprites():
                 bullet.draw_bullet()
             self.ship.blitme()
+            self.aliens.draw(self.screen)
 
             pygame.display.flip()
 
