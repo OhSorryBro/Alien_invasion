@@ -27,16 +27,19 @@ class AlienInvasion:
         self.stars = pygame.sprite.Group()
         self._create_stars()
         self._create_fleet()
+        self.game_active = False
 
     def run_game(self):
         """Starting the game loop"""
         while True:
             self._check_events()
-            self.ship.update()
-            # self.bullets.update()
-            self._update_bullets()
-            # print(len(self.bullets))
-            self._update_aliens()
+            if self.game_active:
+                self.ship.update()
+                # self.bullets.update()
+                self._update_bullets()
+                # print(len(self.bullets))
+                self._update_aliens()
+
             self._update_screen()
             self.clock.tick(60)  
 
@@ -101,15 +104,18 @@ class AlienInvasion:
 
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             self._ship_hit()
+        self._check_aliens_bottom()
 
     def _ship_hit(self):
-        self.stats.ships_left -= 1
-        self.bullets.empty()
-        self.aliens.empty()
-        self._create_fleet()
-        self.ship.center_ship()
-
-        sleep(0.5)
+        if self.stats.ships_left > 0:
+            self.stats.ships_left -= 1
+            self.bullets.empty()
+            self.aliens.empty()
+            self._create_fleet()
+            self.ship.center_ship()
+            sleep(0.5)
+        else:
+            self.game_active = False
 
     def _create_fleet(self):
         alien = Alien(self)
@@ -170,6 +176,12 @@ class AlienInvasion:
             self.aliens.draw(self.screen)
 
             pygame.display.flip()
+
+    def _check_aliens_bottom(self):
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= self.settings.screen_height:
+                self._ship_hit()
+                break
 
 
 if __name__ == '__main__':
